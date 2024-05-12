@@ -1,8 +1,6 @@
 const mongoose = require("mongoose");
 
 const userSchema = mongoose.Schema({
-
-
     googleId: String,
     userId: { type: Number, unique: true },
     name: { type: String, required: true },
@@ -14,6 +12,8 @@ const userSchema = mongoose.Schema({
     }
 
 
+},{
+    versionKey:false
 })
 
 const UserModel = mongoose.model('users', userSchema);

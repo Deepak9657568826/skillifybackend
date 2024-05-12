@@ -9,23 +9,34 @@ const { blacklistModel } = require("../models/blacklist.model");
 const registerUser = async (req, res) => {
     const { email, password, name } = req.body;
     try {
-        //before creating user we have to check if user is present or not
-        const user = await UserModel.findOne({ email: email });
-        if (user) {
-            return res.status(401).json({ message: "user is already registered" });
+        // Check if user already exists
+        const existingUser = await UserModel.findOne({ email });
+        if (existingUser) {
+            return res.status(409).json({ message: "User with this email already exists" });
         }
-        bcrypt.hash(password, 10, async (err, data) => {
-            if (err) {
-                throw new Error(err.message);
-            }
-            const newUser = new UserModel({ email, password: data, name })
-            await newUser.save();
-            return res.status(200).json({ message: "user registered successfully" });
-        })
-    } catch (err) {
-        res.status(400).json({ message: err.message });
+        const users=await UserModel.find();
+        let id=1;
+        if(users&&users.length>0){
+          users.sort((a, b) => a.userId - b.userId)
+             id=users[users.length-1].userId;
+             id=id+1;
+        }
+    const userId=id;
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create a new user
+        const newUser = new UserModel({ userId,email, password: hashedPassword, name });
+        await newUser.save();
+
+        // Send success response
+        return res.status(201).json({ message: "User registered successfully" });
+    } catch (error) {
+        // Handle errors
+        console.error("Error registering user:", error);
+        res.status(500).json({ message: "Internal server error" });
     }
-}
+};
 
 
 const loginUser = async (req, res) => {

@@ -6,8 +6,6 @@ const offerServicesRoute = express.Router()
 // create new service
 offerServicesRoute.post("/newServices", createOfferService)
 
-
-
 // get all offer service
 offerServicesRoute.get("/newServices", getAllOfferServices)
 
